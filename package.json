@@ -1,0 +1,56 @@
+{
+  "name": "gotrack",
+  "productName": "GoTrack",
+  "version": "0.3.2",
+  "description": "GoTrack! - track your goals, plans and dreams in your own categories. Everything stays on your device.",
+  "main": "main.js",
+  "author": "GoTrack",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/logic.test.js test/i18n.test.js",
+    "dist": "electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^40.4.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "app.gotrack.desktop",
+    "productName": "GoTrack",
+    "copyright": "GoTrack",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "GoTrack-Setup-${version}.exe",
+      "warningsAsErrors": false
+    }
+  }
+}
