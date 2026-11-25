@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # manuell starten: GitHub > Actions > "Build Android APK" > Run workflow
   push:
     tags:
-      - 'v*' # z. B. v0.4.0: baut die APK und hängt sie an die Release-Seite
+      - 'android-v*' # z. B. android-v0.4.0: baut die APK und hängt sie an ein eigenes Android-Release
 
 permissions:
   contents: write
@@ -22,12 +22,14 @@ jobs:
         with:
           node-version: 22
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
+      # Das Android-SDK ist auf den GitHub-Linux-Rechnern schon installiert; nur Lizenzen bestaetigen.
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
 
       - name: Tests (app logic)
         working-directory: .
@@ -79,7 +81,8 @@ jobs:
           path: out/GoTrack-*.apk
 
       - name: Publish release (tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/android-v')
         uses: softprops/action-gh-release@v2
         with:
           files: out/GoTrack-*.apk
+          make_latest: false
