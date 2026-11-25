@@ -1,0 +1,85 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # manuell starten: GitHub > Actions > "Build Android APK" > Run workflow
+  push:
+    tags:
+      - 'v*' # z. B. v0.4.0: baut die APK und hängt sie an die Release-Seite
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Tests (app logic)
+        working-directory: .
+        run: node --test test/logic.test.js test/i18n.test.js
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Copy the app into the Android project
+        run: |
+          node scripts/prepare-web.js
+          npx cap add android
+          node scripts/patch-android.js
+          npx cap sync android
+
+      - name: Prepare signing key
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/gotrack.keystore"
+            echo "GOTRACK_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "GOTRACK_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "GOTRACK_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Kein Signierschluessel hinterlegt: Es wird ein einmaliger Schluessel erzeugt. Diese APK laesst sich spaeter NICHT als Update ueber eine andere Version installieren."
+            keytool -genkeypair -keystore "$RUNNER_TEMP/gotrack.keystore" -alias gotrack -keyalg RSA -keysize 2048 -validity 10000 -storepass temp-key-123 -keypass temp-key-123 -dname "CN=GoTrack temporary"
+            echo "GOTRACK_KEYSTORE_PASSWORD=temp-key-123" >> "$GITHUB_ENV"
+            echo "GOTRACK_KEY_ALIAS=gotrack" >> "$GITHUB_ENV"
+            echo "GOTRACK_KEY_PASSWORD=temp-key-123" >> "$GITHUB_ENV"
+          fi
+          echo "GOTRACK_KEYSTORE=$RUNNER_TEMP/gotrack.keystore" >> "$GITHUB_ENV"
+
+      - name: Build APK
+        working-directory: mobile/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Name the APK
+        run: |
+          VERSION=$(node -p "require('../package.json').version")
+          mkdir -p ../out
+          cp android/app/build/outputs/apk/release/app-release.apk "../out/GoTrack-$VERSION.apk"
+          ls -la ../out
+
+      - name: Provide APK as download
+        uses: actions/upload-artifact@v4
+        with:
+          name: GoTrack-Android
+          path: out/GoTrack-*.apk
+
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/GoTrack-*.apk

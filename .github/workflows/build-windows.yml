@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # manuell starten: GitHub > Actions > "Build Windows setup" > Run workflow
   push:
     tags:
-      - 'v*' # z. B. v0.3.2: baut das Setup und hängt es an eine Release-Seite (öffentlicher Download)
+      - 'v*' # z. B. v0.4.0: baut das Setup und hängt es an eine Release-Seite (öffentlicher Download)
 
 permissions:
   contents: write

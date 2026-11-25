@@ -1,7 +1,7 @@
 {
   "name": "gotrack",
   "productName": "GoTrack",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "GoTrack! - track your goals, plans and dreams in your own categories. Everything stays on your device.",
   "main": "main.js",
   "author": "GoTrack",

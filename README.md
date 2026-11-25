@@ -14,6 +14,13 @@ If GoTrack! is already installed, running the setup again offers **Repair**, **R
 > Windows may show "Windows protected your PC" because the app is not code-signed (certificates cost money).
 > Click **More info** and then **Run anyway**.
 
+## Android
+
+An Android version (APK, Android 10 or newer) is built from the same code. Download `GoTrack-x.y.z.apk` from the
+[Releases](../../releases) page and open it on your phone (Android asks you to allow installing from this source).
+Your data stays on the phone. **Export** saves a file to `Downloads/GoTrack Export/`; **Import** reads such a file again.
+The APK is built online by GitHub Actions (`.github/workflows/build-android.yml`, wrapper in `mobile/`, uses Capacitor).
+
 ## Features
 
 - **Categories** of your own (e.g. "Bucket List"), with an icon (or a dot) and a color
@@ -64,6 +71,7 @@ and add it to the language menu (`renderer/app.js`, function `openSettings`). `n
 | `renderer/app.js` | User interface |
 | `renderer/style.css` | Design (all through CSS variables) |
 | `build/` | App icon and installer script |
+| `mobile/` | Android wrapper (Capacitor): build scripts, storage/export plugin |
 | `test/` | Automated tests |
 
 ## Later: Android and iOS

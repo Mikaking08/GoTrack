@@ -27,6 +27,7 @@
 
     'nav.overview': 'Overview',
     'nav.history': 'History',
+    'nav.menu': 'Menu',
     'nav.inProgress': 'Goals in progress',
     'nav.achieved': 'Achieved goals',
     'nav.categories': 'Categories',
@@ -210,6 +211,7 @@
 
     'nav.overview': 'Übersicht',
     'nav.history': 'Verlauf',
+    'nav.menu': 'Menü',
     'nav.inProgress': 'Ziele in Arbeit',
     'nav.achieved': 'Erreichte Ziele',
     'nav.categories': 'Kategorien',

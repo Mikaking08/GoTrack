@@ -1,0 +1,8 @@
+{
+  "appId": "app.gotrack.android",
+  "appName": "GoTrack",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -204,6 +204,10 @@
   // Rückgabe: Ergebnis, der value des gedrückten Buttons – oder null bei Escape/Klick daneben.
   function modal({ title, message, content, buttons, getResult }) {
     return new Promise((resolve) => {
+      if (state.drawerOpen) {
+        state.drawerOpen = false;
+        document.getElementById('app').classList.remove('drawer-open');
+      }
       let finished = false;
       let downOnBackdrop = false;
       const dlg = h('dialog', { class: 'modal' });
@@ -564,7 +568,9 @@
       }
     });
 
-    const where = window.api
+    const where = window.api && window.api.mobile
+      ? [h('p', { class: 'path', text: t('settings.dataFile', { path: (state.info && state.info.dataPath) || '' }) })]
+      : window.api
       ? [
           h('p', { class: 'path', text: t('settings.dataFile', { path: (state.info && state.info.dataPath) || '' }) }),
           h('button', { type: 'button', class: 'btn small', text: t('settings.showFolder'), onClick: () => window.api.showDataFolder() })
@@ -601,6 +607,7 @@
 
   function setView(type, id) {
     state.view = { type, id: id || null };
+    state.drawerOpen = false;
     render({ resetScroll: true });
   }
 
@@ -748,7 +755,13 @@
       });
   }
 
+  function closeDrawer() {
+    state.drawerOpen = false;
+    document.getElementById('app').classList.remove('drawer-open');
+  }
+
   async function doExport() {
+    closeDrawer();
     const text = JSON.stringify(L.createExport(state.data), null, 2);
     const result = await storage.exportFile(text, 'gotrack-' + dateStamp() + '.json', {
       title: t('export.dialogTitle'),
@@ -759,6 +772,7 @@
   }
 
   async function doImport() {
+    closeDrawer();
     const result = await storage.importFile({
       title: t('import.dialogTitle'),
       filter: t('import.filter'),
@@ -857,6 +871,22 @@
   }
 
   const textIcon = (symbol) => h('span', { class: 'nav-icon', text: symbol, 'aria-hidden': 'true' });
+
+  // Handy-Layout: Seitenleiste wird zum ausfahrbaren Menü (am PC ist diese Leiste ausgeblendet).
+  function toggleDrawer() {
+    state.drawerOpen = !state.drawerOpen;
+    document.getElementById('app').classList.toggle('drawer-open', state.drawerOpen);
+  }
+
+  function renderTopbar() {
+    return h(
+      'header',
+      { class: 'topbar' },
+      h('button', { type: 'button', class: 'icon-btn topbar-menu', 'aria-label': t('nav.menu'), text: '☰', onClick: toggleDrawer }),
+      h('img', { class: 'brand-mark', src: 'logo.png', alt: '', width: '28', height: '28', draggable: 'false' }),
+      h('span', { class: 'topbar-title', text: listName() })
+    );
+  }
 
   function renderSidebar() {
     const d = state.data;
@@ -1470,7 +1500,8 @@
     const mainScroll = oldMain && !(options && options.resetScroll) ? oldMain.scrollTop : 0;
     const listScroll = oldList ? oldList.scrollTop : 0;
 
-    root.replaceChildren(renderSidebar(), renderMain());
+    root.replaceChildren(renderTopbar(), renderSidebar(), h('div', { class: 'drawer-backdrop', onClick: toggleDrawer }), renderMain());
+    root.classList.toggle('drawer-open', !!state.drawerOpen);
 
     const main = root.querySelector('.main');
     const list = root.querySelector('.cat-list');
@@ -1504,7 +1535,7 @@
     const root = document.getElementById('app');
     root.classList.remove('app');
     const children = [h('h1', { text: t('err.loadTitle') }), h('p', { text: message }), h('p', { class: 'muted', text: t('err.untouched') })];
-    if (window.api) {
+    if (window.api && !window.api.mobile) {
       children.push(h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: t('settings.showFolder'), onClick: () => window.api.showDataFolder() })));
     }
     root.replaceChildren(h('div', { class: 'fatal' }, children));
