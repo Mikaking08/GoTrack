@@ -1,0 +1,37 @@
+name: Release
+
+# Ein Tag wie v0.5.0 baut ALLES (Windows-Setup + Android-APK) und legt EIN Release mit beiden Dateien an.
+# Die Web-App (iPhone/Mac/Browser) wird separat durch deploy-web.yml bei jedem Push auf main veroeffentlicht.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    uses: ./.github/workflows/build-windows.yml
+  android:
+    uses: ./.github/workflows/build-android.yml
+    secrets: inherit
+  publish:
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - run: ls -la assets
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: GoTrack! ${{ github.ref_name }}
+          body_path: RELEASE-NOTES.md
+          files: |
+            assets/GoTrack-Setup-*.exe
+            assets/GoTrack-*.apk
+          make_latest: true

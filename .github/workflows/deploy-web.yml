@@ -1,0 +1,48 @@
+name: Deploy web app (GitHub Pages)
+
+on:
+  workflow_dispatch: # manuell starten: GitHub > Actions > "Deploy web app" > Run workflow
+  push:
+    branches: [main]
+    paths:
+      - 'renderer/**'
+      - 'web/**'
+      - 'package.json'
+      - '.github/workflows/deploy-web.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tests (app logic)
+        run: node --test test/logic.test.js test/i18n.test.js
+
+      - name: Build web app
+        run: node web/build-web.js
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web-dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

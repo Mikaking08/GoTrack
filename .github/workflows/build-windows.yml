@@ -2,9 +2,7 @@ name: Build Windows setup
 
 on:
   workflow_dispatch: # manuell starten: GitHub > Actions > "Build Windows setup" > Run workflow
-  push:
-    tags:
-      - 'v*' # z. B. v0.4.0: baut das Setup und hängt es an eine Release-Seite (öffentlicher Download)
+  workflow_call: # wird von release.yml aufgerufen (Tag v*)
 
 permissions:
   contents: write
@@ -39,9 +37,3 @@ jobs:
         with:
           name: GoTrack-Setup
           path: dist/GoTrack-Setup-*.exe
-
-      - name: Publish release (tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/GoTrack-Setup-*.exe
