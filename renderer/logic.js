@@ -18,10 +18,22 @@
   //  1 = erste Version, 2 = Verlauf (doneAt), Notizen (entries), Beschreibungen, Listenname, Sprache
   //  3 = frei änderbares Erreicht-Datum eines Ziels (completedAtManual)
   const DATA_VERSION = 3;
-  const LANGUAGES = ['de', 'en'];
+  // Sprachen der App (Kuerzel -> Eigenname). Alle Texte stehen in i18n.js (de, en) und i18n-more.js (alle weiteren).
+  const LANGUAGE_NAMES = {
+    de: 'Deutsch', en: 'English',
+    bg: 'Български', hr: 'Hrvatski', cs: 'Čeština', da: 'Dansk', nl: 'Nederlands', et: 'Eesti', fi: 'Suomi',
+    fr: 'Français', el: 'Ελληνικά', hu: 'Magyar', ga: 'Gaeilge', it: 'Italiano', lv: 'Latviešu', lt: 'Lietuvių',
+    mt: 'Malti', pl: 'Polski', pt: 'Português', ro: 'Română', sk: 'Slovenčina', sl: 'Slovenščina', es: 'Español',
+    sv: 'Svenska', ru: 'Русский', uk: 'Українська', be: 'Беларуская', sr: 'Српски', bs: 'Bosanski',
+    mk: 'Македонски', sq: 'Shqip', tr: 'Türkçe', nb: 'Norsk bokmål', is: 'Íslenska', ca: 'Català', eu: 'Euskara',
+    gl: 'Galego', cy: 'Cymraeg', lb: 'Lëtzebuergesch', ka: 'ქართული', hy: 'Հայերեն', ja: '日本語', zh: '简体中文'
+  };
+  const LANGUAGES = Object.keys(LANGUAGE_NAMES);
+  // Andere Kuerzel, die dieselbe Sprache meinen (z. B. Systemsprache "no" oder "nn" -> Norwegisch Bokmal)
+  const LANGUAGE_ALIASES = { no: 'nb', nn: 'nb', in: 'id', iw: 'he', fil: 'tl', mo: 'ro', sh: 'sr', hbs: 'sr' };
 
   const DEFAULT_SETTINGS = Object.freeze({
-    language: 'auto', // 'auto' | 'de' | 'en'
+    language: 'auto', // 'auto' oder ein Sprachkuerzel aus LANGUAGES
     listName: '', // leer = Standardname "GoTrack!"
     theme: 'system', // 'system' | 'light' | 'dark'
     accent: '#4f7cff',
@@ -110,7 +122,8 @@
   // 'auto' folgt der Systemsprache. Alles, was wir nicht übersetzt haben, bekommt Englisch.
   function resolveLanguage(setting, locale) {
     if (LANGUAGES.includes(setting)) return setting;
-    const base = String(locale || '').toLowerCase().split(/[-_]/)[0];
+    let base = String(locale || '').toLowerCase().split(/[-_]/)[0];
+    base = LANGUAGE_ALIASES[base] || base;
     return LANGUAGES.includes(base) ? base : 'en';
   }
 
@@ -659,6 +672,7 @@
     APP_ID,
     DATA_VERSION,
     LANGUAGES,
+    LANGUAGE_NAMES,
     DEFAULT_SETTINGS,
     uid,
     resolveLanguage,

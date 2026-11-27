@@ -1,18 +1,18 @@
 /*
  * GoTrack! – Übersetzungen.
- * Neue Sprache hinzufügen: ein weiteres Objekt unter "dictionaries" anlegen (gleiche Schlüssel wie "en"),
- * die Sprache in LANGUAGES (logic.js) eintragen und im Einstellungsdialog (app.js) in der Liste ergänzen.
+ * Neue Sprache hinzufügen: Texte in i18n-more.js ergänzen (gleiche Schlüssel wie "en", Mehrzahlformen nach Sprache)
+ * und die Sprache mit Eigennamen in LANGUAGE_NAMES (logic.js) eintragen. Der Einstellungsdialog nutzt diese Liste automatisch.
  * Fehlt ein Text in einer Sprache, wird automatisch der englische verwendet.
  *
- * Platzhalter wie {title} werden ersetzt. Schlüssel mit ".one"/".other" sind Mehrzahlformen: t('count.goals', { n: 3 }).
+ * Platzhalter wie {title} werden ersetzt. Schlüssel mit ".one"/".other" (je nach Sprache auch .zero/.two/.few/.many) sind Mehrzahlformen: t('count.goals', { n: 3 }).
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require('./i18n-more.js'));
   } else {
-    root.GoI18n = factory();
+    root.GoI18n = factory(root.GoI18nMore || {});
   }
-})(typeof self !== 'undefined' ? self : this, function () {
+})(typeof self !== 'undefined' ? self : this, function (more) {
   'use strict';
 
   const en = {
@@ -383,22 +383,36 @@
     'notice.corruptKept': 'Die gespeicherten Daten waren beschädigt und konnten nicht gelesen werden. Eine Kopie liegt in: {path}'
   };
 
-  const dictionaries = { en, de };
+  // en und de stehen in dieser Datei, alle weiteren Sprachen in i18n-more.js
+  const dictionaries = Object.assign({}, more, { en, de });
 
   function fill(text, params) {
     if (!params) return text;
     return text.replace(/\{(\w+)\}/g, (match, name) => (params[name] === undefined ? match : String(params[name])));
   }
 
+  const pluralRules = {};
+  function pluralCategory(language, n) {
+    try {
+      if (!pluralRules[language]) pluralRules[language] = new Intl.PluralRules(language);
+      return pluralRules[language].select(n);
+    } catch (e) {
+      return n === 1 ? 'one' : 'other';
+    }
+  }
+
   // translate('de', 'count.goals', { n: 2 }) -> "2 Ziele"
+  // Mehrzahl: Schluessel "count.goals.<Kategorie>" mit one/zero/two/few/many/other (je nach Sprache), Rueckfall auf ".other".
   function translate(language, key, params) {
     const dict = dictionaries[language] || en;
-    let resolved = key;
+    let text;
     if (params && typeof params.n === 'number') {
-      const form = params.n === 1 ? '.one' : '.other';
-      if (dict[key + form] !== undefined || en[key + form] !== undefined) resolved = key + form;
+      const cat = pluralCategory(language, params.n);
+      text = dict[key + '.' + cat];
+      if (text === undefined) text = dict[key + '.other'];
+      if (text === undefined) text = en[key + (cat === 'one' ? '.one' : '.other')];
     }
-    const text = dict[resolved] !== undefined ? dict[resolved] : en[resolved];
+    if (text === undefined) text = dict[key] !== undefined ? dict[key] : en[key];
     return text === undefined ? key : fill(text, params);
   }
 

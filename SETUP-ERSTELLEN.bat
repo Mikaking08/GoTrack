@@ -60,7 +60,7 @@ if errorlevel 1 (
 echo.
 echo ==== FERTIG! ====
 echo Setup MIT Menue (Reparieren/Neu installieren/Deinstallieren), falls oben kein HINWEIS steht.
-echo Die Setup-Datei liegt im Ordner "dist":  GoTrack-Setup-0.4.0.exe
+echo Die Setup-Datei liegt im Ordner "dist":  GoTrack-Setup-0.5.0.exe
 echo Diese eine Datei kannst du installieren und an andere weitergeben.
 echo.
 explorer "%~dp0dist"

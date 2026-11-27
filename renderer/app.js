@@ -48,7 +48,8 @@
 
   function dateLocale() {
     if (state.lang === 'de') return 'de-DE';
-    return /^en/i.test(systemLocale()) ? systemLocale() : 'en-GB';
+    if (state.lang === 'en') return /^en/i.test(systemLocale()) ? systemLocale() : 'en-GB';
+    return state.lang;
   }
 
   function fmtDate(iso) {
@@ -439,8 +440,7 @@
     const langSel = selectEl(
       [
         ['auto', t('settings.langAuto')],
-        ['de', 'Deutsch'],
-        ['en', 'English']
+        ...L.LANGUAGES.map((code) => [code, L.LANGUAGE_NAMES[code]])
       ],
       s.language,
       (v, sel) => {

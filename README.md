@@ -21,6 +21,14 @@ An Android version (APK, Android 10 or newer) is built from the same code. Downl
 Your data stays on the phone. **Export** saves a file to `Downloads/GoTrack Export/`; **Import** reads such a file again.
 The APK is built online by GitHub Actions (`.github/workflows/build-android.yml`, wrapper in `mobile/`, uses Capacitor).
 
+## Web app (iPhone, Mac, any browser)
+
+GoTrack! also runs as a web app, free and without an account: **https://mikaking08.github.io/gotrack/**
+On iPhone/iPad open it in Safari, tap **Share > Add to Home Screen**; on a Mac you can use it in any browser
+(Safari: File > Add to Dock). It works offline after the first visit. Your data stays in your browser on that device.
+**Tip: use Export regularly as a backup** (browsers can clear website data, e.g. Safari after about 7 days without use
+if the app is not added to the Home Screen).
+
 ## Features
 
 - **Categories** of your own (e.g. "Bucket List"), with an icon (or a dot) and a color
@@ -29,7 +37,7 @@ The APK is built online by GitHub Actions (`.github/workflows/build-android.yml`
 - **History**: a list of when each goal was created and reached and each step was completed; goal names are links, dates are editable
 - **Notes** for every goal and step, plus an optional description
 - **Rename your list** (top left): "Goals", "Dreams", whatever you like
-- **Automatic language** by system language (German, otherwise English); can be changed in Settings
+- **43 languages**: every European language (EU and non-EU, incl. Irish, Welsh, Basque, Catalan, Ukrainian, Georgian, Armenian …) plus Japanese and Simplified Chinese. Chosen automatically by system language, changeable in Settings. Translations are AI-generated – corrections are very welcome!
 - **Export / import** your data as a file, to move to another device
 - **Customizable**: light/dark, accent color, font size, spacing, corner radius
 
@@ -57,8 +65,7 @@ The repository also contains a GitHub Actions workflow (`.github/workflows/build
 
 ## Add a language
 
-In `renderer/i18n.js` add another object with the same keys as `en`, register the language in `LANGUAGES` (`renderer/logic.js`)
-and add it to the language menu (`renderer/app.js`, function `openSettings`). `npm test` checks that no texts are missing.
+Texts live in `renderer/i18n.js` (en, de) and `renderer/i18n-more.js` (all others). To fix a translation, edit the text there. To add a language, add a dictionary with the same keys (plural keys `count.*.<category>` per `Intl.PluralRules`) and register it in `LANGUAGE_NAMES` (`renderer/logic.js`); it appears in the Settings menu automatically. `npm test` checks keys and placeholders.
 
 ## Project layout
 
@@ -71,6 +78,7 @@ and add it to the language menu (`renderer/app.js`, function `openSettings`). `n
 | `renderer/app.js` | User interface |
 | `renderer/style.css` | Design (all through CSS variables) |
 | `build/` | App icon and installer script |
+| `web/` | Web app build (GitHub Pages): manifest, offline cache, icons |
 | `mobile/` | Android wrapper (Capacitor): build scripts, storage/export plugin |
 | `test/` | Automated tests |
 

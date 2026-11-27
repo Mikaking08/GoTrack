@@ -188,8 +188,9 @@ test('Sprache: Systemsprache wird erkannt, alles Unbekannte wird Englisch', () =
   assert.equal(L.resolveLanguage('auto', 'de-DE'), 'de');
   assert.equal(L.resolveLanguage('auto', 'de_AT'), 'de');
   assert.equal(L.resolveLanguage('auto', 'en-US'), 'en');
-  assert.equal(L.resolveLanguage('auto', 'fr-FR'), 'en');
-  assert.equal(L.resolveLanguage('auto', 'ja'), 'en');
+  assert.equal(L.resolveLanguage('auto', 'fr-FR'), 'fr');
+  assert.equal(L.resolveLanguage('auto', 'ja'), 'ja');
+  assert.equal(L.resolveLanguage('auto', 'xx-XX'), 'en');
   assert.equal(L.resolveLanguage('auto', ''), 'en');
   assert.equal(L.resolveLanguage('auto', undefined), 'en');
   assert.equal(L.resolveLanguage('de', 'en-US'), 'de'); // manuelle Wahl gewinnt

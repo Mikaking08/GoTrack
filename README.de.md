@@ -6,33 +6,34 @@ Ziele, Pläne und Träume in eigenen Kategorien festhalten, in Schritte zerlegen
 Alles bleibt lokal auf deinem Gerät: kein Account, kein Server, keine Werbung.
 
 - **Android-Version** (APK, ab Android 10): gleicher Code, Export nach `Downloads/GoTrack Export/`; wird bei GitHub automatisch gebaut (`mobile/`, `.github/workflows/build-android.yml`)
+- **Web-App** (iPhone, Mac, jeder Browser): https://mikaking08.github.io/gotrack/ – am iPhone in Safari „Teilen > Zum Home-Bildschirm“; wird bei GitHub Pages automatisch bereitgestellt (`web/`). Regelmäßig exportieren als Backup!
 - **Kategorien** frei anlegen (z. B. „Bucketliste“), mit Symbol (viele zur Auswahl oder ohne Symbol = Punkt) und Farbe
 - **Ziele** mit **Schritten**, Fortschritt in Prozent pro Schritt, Ziel, Kategorie und insgesamt
 - **Verlauf**: wann welcher Schritt erledigt und welches Ziel erreicht wurde, plus deine Notizen, nach Monaten sortiert
 - **Notizen & Erinnerungen** zu jedem Ziel und jedem Schritt (z. B. dein Tokio-Tagebuch), dazu eine optionale Beschreibung
 - **Eigener Listenname** oben links (Klick darauf): „Goals“, „Dreams“, was du willst
-- **Sprache automatisch** nach Systemsprache (Deutsch, sonst Englisch), in den Einstellungen umstellbar
+- **43 Sprachen**: alle europäischen Sprachen (EU und Nicht-EU, u. a. Irisch, Walisisch, Baskisch, Katalanisch, Ukrainisch, Georgisch, Armenisch …) plus Japanisch und vereinfachtes Chinesisch. Automatisch nach Systemsprache, in den Einstellungen umstellbar. Die Übersetzungen sind KI-erstellt – Korrekturen willkommen!
 - **Export/Import** als Datei, um Ziele auf ein anderes Gerät mitzunehmen
 - **Anpassbar**: Hell/Dunkel, Akzentfarbe, Schriftgröße, Abstände, Ecken-Rundung
 
 ## Die Setup-Datei (.exe) bekommen
 
 Eine fertige `.exe` muss einmal gebaut werden. Das passiert **nicht** beim Nutzer, sondern bei dir (oder bei GitHub).
-Danach gibt es nur noch **eine einzige Datei**: `GoTrack-Setup-0.4.0.exe`. Sie installiert die App, legt auf Wunsch
+Danach gibt es nur noch **eine einzige Datei**: `GoTrack-Setup-0.5.0.exe`. Sie installiert die App, legt auf Wunsch
 eine Desktop-Verknüpfung an, und danach startet GoTrack! wie jedes normale Programm per Doppelklick, ohne Eingabeaufforderung.
 
 ### Weg 1: Doppelklick auf deinem PC (einfachster Weg)
 
 1. [Node.js](https://nodejs.org) (LTS) installieren, falls noch nicht geschehen.
 2. Ordner entpacken und **`SETUP-ERSTELLEN.bat`** doppelt anklicken. Mit „Ja“ bestätigen (Administratorrechte).
-3. Warten (beim ersten Mal einige Minuten). Am Ende öffnet sich der Ordner `dist` mit `GoTrack-Setup-0.4.0.exe`.
+3. Warten (beim ersten Mal einige Minuten). Am Ende öffnet sich der Ordner `dist` mit `GoTrack-Setup-0.5.0.exe`.
 
 ### Weg 2: Kostenlos bei GitHub bauen und gleichzeitig öffentlich anbieten
 
 1. Auf github.com ein kostenloses Konto anlegen und ein neues, **öffentliches** Repository erstellen.
 2. Den Projektordner hochladen (inklusive des Ordners `.github`).
 3. **Actions** > **Build Windows setup** > **Run workflow**: Nach wenigen Minuten gibt es die Setup-Datei bei **Artifacts**.
-4. Für einen öffentlichen Download-Link: unter **Releases** eine neue Version mit dem Tag `v0.4.0` anlegen.
+4. Für einen öffentlichen Download-Link: unter **Releases** eine neue Version mit dem Tag `v0.5.0` anlegen.
    Der Workflow hängt die Setup-Datei dann automatisch an die Release-Seite. Diesen Link kann jeder öffnen und
    die Datei herunterladen, kostenlos.
 
@@ -87,9 +88,7 @@ von GoTrack! automatisch übernommen.
 
 ## Eine Sprache hinzufügen
 
-In `renderer/i18n.js` ein weiteres Objekt mit denselben Schlüsseln wie `en` anlegen, die Sprache in `LANGUAGES`
-(`renderer/logic.js`) eintragen und im Sprach-Menü (`renderer/app.js`, Funktion `openSettings`) ergänzen.
-`npm test` prüft, dass keine Texte fehlen.
+Texte stehen in `renderer/i18n.js` (en, de) und `renderer/i18n-more.js` (alle anderen); Übersetzungen dort korrigieren. Neue Sprache: Wörterbuch mit denselben Schlüsseln anlegen (Mehrzahl-Schlüssel `count.*.<Kategorie>` nach `Intl.PluralRules`) und in `LANGUAGE_NAMES` (`renderer/logic.js`) eintragen; sie erscheint automatisch im Einstellungs-Menü. `npm test` prüft Schlüssel und Platzhalter.
 
 ## Projektaufbau
 
